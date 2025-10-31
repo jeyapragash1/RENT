@@ -7,6 +7,7 @@ export default function AdminDashboard() {
   const [active, setActive] = useState('dashboard');
   const [customers, setCustomers] = useState([]);
   const [vehicles, setVehicles] = useState([]);
+  const [rentals, setRentals] = useState([]);
   const [counts, setCounts] = useState({});
   const [payments, setPayments] = useState({});
   const [loading, setLoading] = useState(true);
@@ -34,6 +35,7 @@ export default function AdminDashboard() {
       setCounts(data.counts || {});
       setPayments(data.payments || {});
       setVehicles(data.vehicles || []);
+  // compute top sellers later from vehicles
 
       // Fetch customers list separately
       const cRes = await fetch('http://localhost:8000/api/admin/customers', {
@@ -51,8 +53,23 @@ export default function AdminDashboard() {
     }
   };
 
+  const fetchRentals = async () => {
+    if (!token) return;
+    try {
+      const res = await fetch('http://localhost:8000/api/rentals', {
+        headers: { 'Authorization': `Bearer ${token}` },
+      });
+      if (!res.ok) throw new Error('Failed to fetch rentals');
+      const data = await res.json();
+      setRentals(data || []);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   useEffect(() => {
     fetchData();
+    fetchRentals();
   }, [token]);
 
   // Delete customer
@@ -87,6 +104,46 @@ export default function AdminDashboard() {
       alert('Error approving vehicle');
     }
   };
+
+  // Export rentals as CSV
+  const exportRentalsCSV = () => {
+    if (!rentals || !rentals.length) {
+      alert('No rentals to export');
+      return;
+    }
+
+    const headers = ['ID','Customer','Vehicle','Start Date','End Date','Total Amount','Status'];
+    const rows = rentals.map(r => [
+      r.id,
+      r.customer?.name || r.customer_id,
+      r.vehicle?.model || r.vehicle_id,
+      r.rent_start_date,
+      r.rent_end_date,
+      r.total_amount,
+      r.status,
+    ]);
+
+    const csvContent = [headers, ...rows].map(e => e.join(',')).join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `rentals_${new Date().toISOString().slice(0,10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  // Compute top sellers from vehicles list
+  const topSellers = (() => {
+    const map = {};
+    vehicles.forEach(v => {
+      const id = v.owner?.id || v.user_id || v.userId || 'unknown';
+      const name = v.owner?.name || 'Unknown';
+      if (!map[id]) map[id] = { id, name, count: 0 };
+      map[id].count += 1;
+    });
+    return Object.values(map).sort((a,b)=>b.count-a.count).slice(0,5);
+  })();
 
   // Reject vehicle
   const rejectVehicle = async (id) => {

@@ -4,6 +4,7 @@ import { useState } from "react";
 export default function Login() {
   const [form, setForm] = useState({ email: "", password: "" });
   const [loading, setLoading] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -14,7 +15,11 @@ export default function Login() {
     setLoading(true);
 
     try {
-      const res = await fetch("http://localhost:8000/api/customers/login", {
+      const endpoint = isAdmin ? 
+        "http://localhost:8000/api/admin/login" : 
+        "http://localhost:8000/api/customers/login";
+
+      const res = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
@@ -31,9 +36,19 @@ export default function Login() {
       // ✅ Save token and user info in localStorage
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data.user));
+      // For compatibility with existing admin pages that expect 'admin_token'
+      if (isAdmin) {
+        localStorage.setItem('admin_token', data.token);
+      }
 
       alert("Login successful!");
-      window.location.href = "/all-vehicle"; // ✅ redirect after login
+      // Redirect admin users to admin dashboard; regular users to vehicles
+      if (isAdmin) {
+        // Redirect to the existing rental admin dashboard page (rentalAdmin)
+        window.location.href = "/rentalAdmin";
+      } else {
+        window.location.href = "/all-vehicle"; // ✅ redirect after login
+      }
     } catch (err) {
       console.error(err);
       alert("Something went wrong!");
@@ -72,6 +87,10 @@ export default function Login() {
             Login to Your Account
           </h2>
           <form onSubmit={handleSubmit}>
+            <label className="flex items-center gap-3 mb-4">
+              <input type="checkbox" checked={isAdmin} onChange={(e) => setIsAdmin(e.target.checked)} className="w-4 h-4" />
+              <span className="text-sm text-gray-600">Login as Admin</span>
+            </label>
             <Input
               icon="📧"
               placeholder="Email"
