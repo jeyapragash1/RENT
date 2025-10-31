@@ -13,6 +13,32 @@ import {
   FaThumbsUp,
 } from "react-icons/fa";
 
+// Interactive FAQ accordion used in the page
+function FAQList() {
+  const [openIndex, setOpenIndex] = useState(null);
+  const faqs = [
+    { q: 'How do I book a vehicle?', a: 'Search for a vehicle, select dates, then confirm booking and pay securely.' },
+    { q: 'What documents are required?', a: 'A valid driving license and a government ID are typically required.' },
+    { q: 'Can I cancel my booking?', a: 'Yes — cancellation policy depends on the vehicle owner; check the booking details.' },
+  ];
+
+  return (
+    <div className="space-y-4">
+      {faqs.map((f, i) => (
+        <div key={i} className="bg-white p-4 rounded-lg shadow">
+          <button className="w-full text-left flex justify-between items-center" onClick={() => setOpenIndex(openIndex === i ? null : i)}>
+            <span className="font-semibold text-gray-800">{f.q}</span>
+            <span className="text-gray-500">{openIndex === i ? '-' : '+'}</span>
+          </button>
+          {openIndex === i && (
+            <p className="text-sm text-gray-600 mt-3">{f.a}</p>
+          )}
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export default function Home() {
   const router = useRouter();
   const [featured, setFeatured] = useState([]);
@@ -52,85 +78,40 @@ export default function Home() {
         {/* Overlay */}
         <div className="absolute inset-0 bg-black bg-opacity-60"></div>
 
-        {/* ===== Header ===== */}
         <div className="relative z-10">
-          <header className="flex justify-between items-center px-8 py-6 text-white">
-            {/* Logo */}
-            <div className="flex items-center space-x-3">
-              <img
-                src="/images/modern-car-rental-logo-template-auto-service-and-ride-share-branding-vector.jpg"
-                alt="Rental Logo"
-                className="w-12 h-12 object-contain rounded-full bg-white p-1"
-              />
-              <span className="text-2xl font-bold tracking-wide">Rental</span>
-            </div>
-
-            {/* Navigation */}
-            <nav className="flex space-x-6 text-lg">
-              <button
-                onClick={() => router.push("/")}
-                className="text-yellow-300 border-b-2 border-yellow-300 pb-1 transition"
-              >
-                Home
-              </button>
-              <button
-                onClick={() => router.push("/all-vehicle")}
-                className="hover:text-yellow-300 transition"
-              >
-                Rent a Vehicle
-              </button>
-            </nav>
-
-            {/* Auth Buttons */}
-            <div className="flex space-x-4">
-              <button
-                onClick={() => router.push("/rentalRegister")}
-                className="px-4 py-2 bg-white text-purple-700 rounded-md font-semibold hover:bg-yellow-300 transition"
-              >
-                Sign Up
-              </button>
-              <button
-                onClick={() => router.push("/rentalLogin")}
-                className="px-4 py-2 border border-white rounded-md hover:bg-white hover:text-purple-700 transition"
-              >
-                Sign In
-              </button>
-            </div>
-          </header>
-
           {/* ===== Hero Text + Search ===== */}
-          <div className="flex flex-col items-center justify-center text-center mt-16 px-6">
-            <h1 className="text-5xl font-bold mb-4">
+          <div className="flex flex-col items-center justify-center text-center mt-8 px-6">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-4 leading-tight">
               The Power of Mobility With Our Vehicles
             </h1>
-            <p className="text-lg text-gray-200 mb-6">
+            <p className="text-base md:text-lg text-gray-200 mb-6 max-w-2xl">
               Reliable, Affordable, and Convenient Rentals — find the perfect ride in seconds
             </p>
 
             {/* Search Card */}
-            <div className="w-full max-w-4xl bg-white bg-opacity-90 text-gray-900 rounded-xl p-6 shadow-lg">
-              <div className="flex flex-col md:flex-row gap-3">
+            <div className="w-full max-w-4xl bg-white bg-opacity-95 text-gray-900 rounded-xl p-5 shadow-lg">
+              <div className="flex flex-col md:flex-row gap-3 items-center">
                 <input
                   value={location}
                   onChange={(e) => setLocation(e.target.value)}
                   placeholder="Pickup location"
-                  className="flex-1 p-3 rounded border border-gray-200"
+                  className="flex-1 h-14 p-4 rounded-md border border-gray-200 placeholder-gray-400"
                 />
                 <input
                   type="date"
                   value={startDate}
                   onChange={(e) => setStartDate(e.target.value)}
-                  className="p-3 rounded border border-gray-200"
+                  className="h-12 p-3 rounded-md border border-gray-200"
                 />
                 <input
                   type="date"
                   value={endDate}
                   onChange={(e) => setEndDate(e.target.value)}
-                  className="p-3 rounded border border-gray-200"
+                  className="h-12 p-3 rounded-md border border-gray-200"
                 />
                 <button
                   onClick={() => router.push(`/all-vehicle?location=${encodeURIComponent(location)}&start=${startDate}&end=${endDate}`)}
-                  className="bg-purple-700 text-white px-6 py-3 rounded font-semibold hover:bg-purple-800"
+                  className="bg-gradient-to-r from-purple-600 to-purple-700 text-white px-6 py-3 rounded-md font-semibold hover:from-purple-700 hover:to-purple-800"
                 >
                   Search
                 </button>
@@ -272,6 +253,121 @@ export default function Home() {
               <p className="text-gray-500 text-sm">{item.text}</p>
             </div>
           ))}
+        </div>
+      </section>
+
+      {/* ===== How It Works ===== */}
+      <section className="py-16 bg-white text-gray-900">
+        <div className="max-w-6xl mx-auto px-4">
+          <h2 className="text-3xl font-bold mb-6 text-center">How It Works</h2>
+          <div className="grid md:grid-cols-3 gap-8">
+            <div className="p-6 bg-gray-50 rounded-lg shadow">
+              <div className="w-16 h-16 mx-auto mb-4 flex items-center justify-center rounded-full bg-purple-600 text-white text-2xl">
+                <FaCarSide />
+              </div>
+              <h3 className="font-semibold text-lg">Find a Vehicle</h3>
+              <p className="text-sm text-gray-600 mt-2">Search by location, date, and price to find the perfect vehicle for your trip.</p>
+            </div>
+            <div className="p-6 bg-gray-50 rounded-lg shadow">
+              <div className="w-16 h-16 mx-auto mb-4 flex items-center justify-center rounded-full bg-purple-600 text-white text-2xl">
+                <FaClock />
+              </div>
+              <h3 className="font-semibold text-lg">Book & Confirm</h3>
+              <p className="text-sm text-gray-600 mt-2">Select dates, confirm the rental, and pay securely — instant confirmations for many vehicles.</p>
+            </div>
+            <div className="p-6 bg-gray-50 rounded-lg shadow">
+              <div className="w-16 h-16 mx-auto mb-4 flex items-center justify-center rounded-full bg-purple-600 text-white text-2xl">
+                <FaShieldAlt />
+              </div>
+              <h3 className="font-semibold text-lg">Drive with Confidence</h3>
+              <p className="text-sm text-gray-600 mt-2">Vehicles are checked by owners and backed by our platform policies for safety and reliability.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ===== Vehicle Categories ===== */}
+      <section className="py-14 bg-gray-50 text-gray-900">
+        <div className="max-w-6xl mx-auto px-4">
+          <h2 className="text-2xl font-bold mb-4">Popular Categories</h2>
+          <p className="text-sm text-gray-600 mb-6">Browse vehicles grouped by brand and type.</p>
+          <div className="flex flex-wrap gap-4">
+            {(() => {
+              const categories = {};
+              (featured || []).forEach(v => {
+                const key = v.brand || 'Other';
+                categories[key] = (categories[key] || 0) + 1;
+              });
+              const cats = Object.keys(categories).slice(0, 8);
+              if (!cats.length) return <p className="text-sm">No categories yet.</p>;
+              return cats.map((c) => (
+                <div key={c} className="bg-white rounded-lg shadow py-4 px-6">
+                  <h4 className="font-semibold">{c}</h4>
+                  <p className="text-sm text-gray-500">{categories[c]} vehicle(s)</p>
+                </div>
+              ));
+            })()}
+          </div>
+        </div>
+      </section>
+
+      {/* ===== Pricing Plans ===== */}
+      <section className="py-16 bg-white text-gray-900">
+        <div className="max-w-5xl mx-auto px-4 text-center">
+          <h2 className="text-3xl font-bold mb-6">Simple Pricing</h2>
+          <p className="text-gray-600 mb-8">Transparent fees — pay only for the days you use.</p>
+
+          <div className="grid md:grid-cols-3 gap-6">
+            <div className="p-6 border rounded-lg">
+              <h3 className="text-xl font-semibold">Basic</h3>
+              <p className="text-3xl font-bold mt-4">Rs. 0<span className="text-base font-medium">/listing</span></p>
+              <ul className="text-sm text-gray-600 mt-4 space-y-2">
+                <li>List vehicles</li>
+                <li>Basic support</li>
+              </ul>
+              <button className="mt-6 px-4 py-2 bg-purple-700 text-white rounded">Get Started</button>
+            </div>
+            <div className="p-6 border rounded-lg">
+              <h3 className="text-xl font-semibold">Standard</h3>
+              <p className="text-3xl font-bold mt-4">Rs. 199<span className="text-base font-medium">/month</span></p>
+              <ul className="text-sm text-gray-600 mt-4 space-y-2">
+                <li>Featured listings</li>
+                <li>Priority support</li>
+              </ul>
+              <button className="mt-6 px-4 py-2 bg-purple-700 text-white rounded">Choose Plan</button>
+            </div>
+            <div className="p-6 border rounded-lg">
+              <h3 className="text-xl font-semibold">Premium</h3>
+              <p className="text-3xl font-bold mt-4">Rs. 499<span className="text-base font-medium">/month</span></p>
+              <ul className="text-sm text-gray-600 mt-4 space-y-2">
+                <li>Top placement</li>
+                <li>Dedicated manager</li>
+              </ul>
+              <button className="mt-6 px-4 py-2 bg-purple-700 text-white rounded">Upgrade</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ===== FAQ ===== */}
+      <section className="py-12 bg-gray-50 text-gray-900">
+        <div className="max-w-4xl mx-auto px-4">
+          <h2 className="text-2xl font-bold mb-6 text-center">Frequently Asked Questions</h2>
+          <FAQList />
+        </div>
+      </section>
+
+      {/* ===== Newsletter / CTA ===== */}
+      <section className="py-10 bg-gradient-to-r from-purple-700 to-blue-600 text-white">
+        <div className="max-w-4xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-4">
+          <div>
+            <h3 className="text-2xl font-bold">Stay in the loop</h3>
+            <p className="text-gray-100 mt-2">Subscribe for deals, new vehicles and seasonal offers.</p>
+          </div>
+          <form className="flex w-full md:w-auto gap-2" onSubmit={(e)=>{e.preventDefault(); alert('Thanks for subscribing!')}}>
+            <input type="email" required placeholder="Enter your email" className="p-3 rounded text-gray-900" />
+            <button className="px-5 py-3 bg-white text-purple-700 rounded font-semibold">Subscribe</button>
+          </form>
         </div>
       </section>
 
