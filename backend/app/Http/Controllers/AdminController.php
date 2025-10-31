@@ -56,9 +56,10 @@ class AdminController extends Controller
         $yesterdayEnd = now()->subDay()->endOfDay();
         $weekStart = now()->subDays(7)->startOfDay();
 
-        $paymentsToday = \App\Models\Rental::whereBetween('created_at', [$today, now()])->sum('total_amount');
-        $paymentsYesterday = \App\Models\Rental::whereBetween('created_at', [$yesterdayStart, $yesterdayEnd])->sum('total_amount');
-        $paymentsLast7Days = \App\Models\Rental::whereBetween('created_at', [$weekStart, now()])->sum('total_amount');
+    // Use paid_amount to reflect actual received payments (supports partial payments)
+    $paymentsToday = \App\Models\Rental::whereBetween('created_at', [$today, now()])->sum('paid_amount');
+    $paymentsYesterday = \App\Models\Rental::whereBetween('created_at', [$yesterdayStart, $yesterdayEnd])->sum('paid_amount');
+    $paymentsLast7Days = \App\Models\Rental::whereBetween('created_at', [$weekStart, now()])->sum('paid_amount');
 
         return response()->json([
             'counts' => [

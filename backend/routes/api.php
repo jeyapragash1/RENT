@@ -6,6 +6,7 @@ use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\VehicleController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\RentalController;
+use App\Http\Controllers\PayHereController;
 
 /*
 |--------------------------------------------------------------------------
@@ -19,6 +20,11 @@ Route::post('/customers/login', [CustomerController::class, 'login']);
 
 // Public routes for admin
 Route::post('/admin/login', [AdminController::class, 'login']);
+
+// PayHere endpoints (create redirect and IPN notify)
+// Allow GET for /payhere/create to make debugging from browser easier, but prefer POST from the frontend.
+Route::match(['get','post'], '/payhere/create', [PayHereController::class, 'create']);
+Route::post('/payhere/notify', [PayHereController::class, 'notify']);
 
 // Public route to get only approved vehicles
 Route::get('/vehicles/approved', [AdminController::class, 'approvedVehicles']);
@@ -36,6 +42,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // Rentals
     Route::post('/rentals', [RentalController::class, 'store']);
     Route::get('/rentals', [RentalController::class, 'index']); // optional
+    Route::post('/rentals/{id}/pay', [RentalController::class, 'pay']);
 
     // Admin routes (only accessible to users with role 'admin')
     Route::prefix('admin')->middleware('role:admin')->group(function () {

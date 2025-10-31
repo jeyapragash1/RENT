@@ -25,7 +25,7 @@ export default function RentalRegister() {
     setErrors({});
 
     try {
-      const response = await fetch('http://localhost:8000/api/customers/register', {
+  const response = await fetch(`${API_BASE}/api/customers/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form),

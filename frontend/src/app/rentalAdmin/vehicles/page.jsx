@@ -1,16 +1,17 @@
 'use client';
 import { useEffect, useState } from 'react';
+import { API_BASE } from '../../../lib/api';
 
 export default function AdminVehicles() {
   const [vehicles, setVehicles] = useState([]);
-  const backendUrl = 'http://localhost:8000';
+  const backendUrl = API_BASE;
 
   const fetchVehicles = async () => {
     const token = localStorage.getItem('token');
     if (!token) return alert('Not logged in');
 
     try {
-      const res = await fetch(`${backendUrl}/api/admin/vehicles`, {
+  const res = await fetch(`${backendUrl}/api/admin/vehicles`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
@@ -27,7 +28,7 @@ export default function AdminVehicles() {
   const handleApprove = async (id) => {
     const token = localStorage.getItem('token');
     try {
-      const res = await fetch(`${backendUrl}/api/admin/vehicles/${id}/approve`, {
+  const res = await fetch(`${backendUrl}/api/admin/vehicles/${id}/approve`, {
         method: 'PUT',
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -41,7 +42,7 @@ export default function AdminVehicles() {
   const handleReject = async (id) => {
     const token = localStorage.getItem('token');
     try {
-      const res = await fetch(`${backendUrl}/api/admin/vehicles/${id}/reject`, {
+  const res = await fetch(`${backendUrl}/api/admin/vehicles/${id}/reject`, {
         method: 'PUT',
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -57,7 +58,7 @@ export default function AdminVehicles() {
     if (!confirm('Are you sure you want to delete this vehicle?')) return;
 
     try {
-      const res = await fetch(`${backendUrl}/api/admin/vehicles/${id}`, {
+  const res = await fetch(`${backendUrl}/api/admin/vehicles/${id}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
       });

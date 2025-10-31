@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import { API_BASE } from '../lib/api';
 import { useRouter } from "next/navigation";
 import {
   FaFacebook,
@@ -53,7 +54,7 @@ export default function Home() {
     const fetchFeatured = async () => {
       setFvLoading(true);
       try {
-        const res = await fetch('http://localhost:8000/api/vehicles/approved');
+        const res = await fetch(`${API_BASE}/api/vehicles/approved`);
         if (!res.ok) throw new Error('Failed to load featured vehicles');
         const data = await res.json();
         setFeatured(data || []);
@@ -159,7 +160,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ===== Top Sellers ===== */}
+      {/* ===== Top Sellers =====
       <section className="py-12 bg-gray-50 text-gray-900">
         <div className="max-w-5xl mx-auto px-4">
           <h2 className="text-2xl font-semibold mb-6 text-center">Top Sellers</h2>
@@ -191,7 +192,7 @@ export default function Home() {
             })()}
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* ===== Testimonials ===== */}
       <section className="py-12 bg-white text-gray-900">

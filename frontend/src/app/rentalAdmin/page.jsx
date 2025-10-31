@@ -1,5 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
+import { API_BASE } from '../../lib/api';
 import { useRouter } from 'next/navigation';
 
 export default function AdminDashboard() {
@@ -27,7 +28,7 @@ export default function AdminDashboard() {
 
     try {
       // Fetch dashboard summary
-      const res = await fetch('http://localhost:8000/api/admin/dashboard', {
+  const res = await fetch(`${API_BASE}/api/admin/dashboard`, {
         headers: { 'Authorization': `Bearer ${token}` },
       });
       if (!res.ok) throw new Error('Failed to fetch data');
@@ -38,7 +39,7 @@ export default function AdminDashboard() {
   // compute top sellers later from vehicles
 
       // Fetch customers list separately
-      const cRes = await fetch('http://localhost:8000/api/admin/customers', {
+  const cRes = await fetch(`${API_BASE}/api/admin/customers`, {
         headers: { 'Authorization': `Bearer ${token}` },
       });
       if (!cRes.ok) throw new Error('Failed to fetch customers');
@@ -56,7 +57,7 @@ export default function AdminDashboard() {
   const fetchRentals = async () => {
     if (!token) return;
     try {
-      const res = await fetch('http://localhost:8000/api/rentals', {
+  const res = await fetch(`${API_BASE}/api/rentals`, {
         headers: { 'Authorization': `Bearer ${token}` },
       });
       if (!res.ok) throw new Error('Failed to fetch rentals');
@@ -76,7 +77,7 @@ export default function AdminDashboard() {
   const deleteCustomer = async (id) => {
     if (!confirm('Are you sure you want to delete this customer?')) return;
     try {
-      const res = await fetch(`http://localhost:8000/api/admin/customers/${id}`, {
+  const res = await fetch(`${API_BASE}/api/admin/customers/${id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` },
       });
@@ -92,7 +93,7 @@ export default function AdminDashboard() {
   // Approve vehicle
   const approveVehicle = async (id) => {
     try {
-      const res = await fetch(`http://localhost:8000/api/admin/vehicles/${id}/approve`, {
+  const res = await fetch(`${API_BASE}/api/admin/vehicles/${id}/approve`, {
         method: 'PATCH',
         headers: { 'Authorization': `Bearer ${token}` },
       });
@@ -148,7 +149,7 @@ export default function AdminDashboard() {
   // Reject vehicle
   const rejectVehicle = async (id) => {
     try {
-      const res = await fetch(`http://localhost:8000/api/admin/vehicles/${id}/reject`, {
+  const res = await fetch(`${API_BASE}/api/admin/vehicles/${id}/reject`, {
         method: 'PATCH',
         headers: { 'Authorization': `Bearer ${token}` },
       });

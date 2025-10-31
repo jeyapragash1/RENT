@@ -1,5 +1,6 @@
 'use client';
 import { useState } from "react";
+import { API_BASE } from '../lib/api';
 
 export default function Login() {
   const [form, setForm] = useState({ email: "", password: "" });
@@ -16,8 +17,8 @@ export default function Login() {
 
     try {
       const endpoint = isAdmin ? 
-        "http://localhost:8000/api/admin/login" : 
-        "http://localhost:8000/api/customers/login";
+        `${API_BASE}/api/admin/login` : 
+        `${API_BASE}/api/customers/login`;
 
       const res = await fetch(endpoint, {
         method: "POST",

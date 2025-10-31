@@ -1,5 +1,6 @@
 'use client';
 import { useState } from "react";
+import { API_BASE } from '../../../lib/api';
 
 export default function AdminLoginPage() {
   const [email, setEmail] = useState("");
@@ -13,7 +14,7 @@ export default function AdminLoginPage() {
     setError("");
 
     try {
-      const res = await fetch("http://localhost:8000/api/admin/login", {
+  const res = await fetch(`${API_BASE}/api/admin/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),

@@ -15,7 +15,9 @@ class Rental extends Model
         'rent_start_date',
         'rent_end_date',
         'total_amount',
-        'status', // pending / approved / rejected
+        'paid_amount',
+        'payment_status', // unpaid / partial / paid
+        'status', // pending / confirmed / completed / cancelled
     ];
 
     // Relationships

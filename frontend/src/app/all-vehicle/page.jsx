@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from "react";
+import { API_BASE } from '../lib/api';
 import { useRouter } from "next/navigation";
 import {
   FaCar, FaCogs, FaUser, FaCalendarAlt, FaIdCard, FaMoneyBill, FaSignOutAlt
@@ -149,7 +150,7 @@ export default function AvailableVehicles() {
   useEffect(() => {
     const fetchVehicles = async () => {
       try {
-        const res = await fetch("http://localhost:8000/api/vehicles/approved");
+  const res = await fetch(`${API_BASE}/api/vehicles/approved`);
         if (!res.ok) throw new Error("Failed to fetch vehicles");
         const data = await res.json();
         const formatted = data.map((v) => ({
@@ -159,7 +160,7 @@ export default function AvailableVehicles() {
           regNo: v.registration_number,
           dailyRate: v.daily_rate,
           image: v.image
-            ? `http://localhost:8000/storage/${v.image}`
+            ? `${API_BASE}/storage/${v.image}`
             : "/images/logo.jpg",
         }));
         setVehicles(formatted);
@@ -202,7 +203,7 @@ export default function AvailableVehicles() {
         rent_end_date: endDate,
       };
 
-      const res = await fetch("http://localhost:8000/api/rentals", {
+  const res = await fetch(`${API_BASE}/api/rentals`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -224,9 +225,52 @@ export default function AvailableVehicles() {
         throw new Error(data.message || "Failed to rent the vehicle");
       }
 
-      alert(`You successfully rented ${selectedVehicle.model}!`);
+      // If rental created, prompt for payment option (full/half/none)
+      const rental = data.rental || data;
+      if (!rental || !rental.id) {
+        alert('Rental created but could not determine rental id.');
+        setShowRentPopup(false);
+        setSelectedVehicle(null);
+        return;
+      }
+
+      // Ask user whether to pay full, half, or pay later
+      const choice = window.prompt('Type FULL to pay full now, HALF to pay half now, or NONE to pay later', 'FULL');
+      let amountToPay = 0;
+      if (choice && choice.toUpperCase() === 'HALF') {
+        amountToPay = Number(rental.total_amount) / 2;
+      } else if (choice && choice.toUpperCase() === 'NONE') {
+        amountToPay = 0;
+      } else {
+        amountToPay = Number(rental.total_amount);
+      }
+
       setShowRentPopup(false);
       setSelectedVehicle(null);
+
+      if (amountToPay > 0) {
+        // Create a form to POST to the backend PayHere create endpoint so server can redirect to PayHere
+        const form = document.createElement('form');
+        form.method = 'POST';
+  form.action = `${API_BASE}/api/payhere/create`;
+        form.style.display = 'none';
+
+        const addField = (name, value) => {
+          const i = document.createElement('input');
+          i.type = 'hidden';
+          i.name = name;
+          i.value = value;
+          form.appendChild(i);
+        };
+
+        addField('rental_id', rental.id);
+        addField('amount', amountToPay.toFixed(2));
+
+        document.body.appendChild(form);
+        form.submit();
+      } else {
+        alert(`Rental created. You can pay later from your profile or contact the admin.`);
+      }
     } catch (err) {
       console.error(err);
       alert(err.message || "Something went wrong while renting the vehicle.");

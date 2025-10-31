@@ -1,17 +1,18 @@
 'use client';
 import { useEffect, useState } from 'react';
+import { API_BASE } from '../../../lib/api';
 
 export default function AdminCustomers() {
   const [customers, setCustomers] = useState([]);
   const [search, setSearch] = useState('');
-  const backendUrl = 'http://localhost:8000';
+  const backendUrl = API_BASE;
 
   const fetchCustomers = async () => {
     const token = localStorage.getItem('token');
     if (!token) return alert('Not logged in');
 
     try {
-      const res = await fetch(`${backendUrl}/api/admin/customers`, {
+  const res = await fetch(`${backendUrl}/api/admin/customers`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
@@ -30,7 +31,7 @@ export default function AdminCustomers() {
     if (!confirm('Are you sure you want to delete this customer?')) return;
 
     try {
-      const res = await fetch(`${backendUrl}/api/admin/customers/${id}`, {
+  const res = await fetch(`${backendUrl}/api/admin/customers/${id}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
       });

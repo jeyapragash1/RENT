@@ -1,5 +1,6 @@
 'use client';
 import { useState, useEffect } from "react";
+import { API_BASE } from '../lib/api';
 import { useRouter } from "next/navigation";
 
 export default function ProfilePage() {
@@ -16,7 +17,7 @@ export default function ProfilePage() {
   });
   const [vehicles, setVehicles] = useState([]);
   const [editingId, setEditingId] = useState(null);
-  const backendUrl = "http://localhost:8000";
+  const backendUrl = API_BASE;
 
   const getInitials = (name) => {
     if (!name) return "";

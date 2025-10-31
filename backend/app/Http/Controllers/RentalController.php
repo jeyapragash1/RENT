@@ -39,6 +39,22 @@ class RentalController extends Controller
         // Calculate total amount
         $totalAmount = $diffDays * $vehicle->daily_rate;
 
+        // Payment handling: accept optional paid_amount (e.g. from payment gateway callback)
+        $paidAmount = floatval($request->input('paid_amount', 0));
+
+        // Determine payment_status and initial rental status
+        if ($paidAmount >= $totalAmount && $totalAmount > 0) {
+            $paymentStatus = 'paid';
+            $rentalStatus = 'confirmed';
+        } elseif ($paidAmount > 0) {
+            // Partial payment — allow renting when partial payment is accepted
+            $paymentStatus = 'partial';
+            $rentalStatus = 'confirmed';
+        } else {
+            $paymentStatus = 'unpaid';
+            $rentalStatus = 'pending';
+        }
+
         // Create rental
         $rental = Rental::create([
             'vehicle_id' => $request->vehicle_id,
@@ -46,7 +62,9 @@ class RentalController extends Controller
             'rent_start_date' => $request->rent_start_date,
             'rent_end_date' => $request->rent_end_date,
             'total_amount' => $totalAmount,
-            'status' => 'pending',
+            'paid_amount' => $paidAmount,
+            'payment_status' => $paymentStatus,
+            'status' => $rentalStatus,
         ]);
 
         return response()->json([
@@ -54,6 +72,32 @@ class RentalController extends Controller
             'message' => 'Rental created successfully',
             'rental' => $rental
         ], 201);
+    }
+
+    // Endpoint to record a payment for an existing rental
+    public function pay(Request $request, $id)
+    {
+        $rental = Rental::findOrFail($id);
+
+        $amount = floatval($request->input('amount', 0));
+        if ($amount <= 0) {
+            return response()->json(['message' => 'Invalid payment amount'], 422);
+        }
+
+        $rental->paid_amount = floatval($rental->paid_amount) + $amount;
+
+        if ($rental->paid_amount >= $rental->total_amount) {
+            $rental->payment_status = 'paid';
+            $rental->status = 'confirmed';
+        } else {
+            $rental->payment_status = 'partial';
+            // allow renting on partial payment as business rule
+            $rental->status = 'confirmed';
+        }
+
+        $rental->save();
+
+        return response()->json(['message' => 'Payment recorded', 'rental' => $rental]);
     }
 
     // List all rentals

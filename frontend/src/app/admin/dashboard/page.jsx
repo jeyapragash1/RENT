@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import { API_BASE } from '../../../lib/api';
 
 export default function AdminDashboard() {
   const [data, setData] = useState(null);
@@ -14,10 +15,11 @@ export default function AdminDashboard() {
       return;
     }
 
-    fetch("http://localhost:8000/api/admin/dashboard", {
+  fetch(`${API_BASE}/api/admin/dashboard`, {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
+
       },
     })
       .then((r) => {
